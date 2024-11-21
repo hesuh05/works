@@ -59,6 +59,23 @@ public class MainActivity extends AppCompatActivity {
         lvStudents = findViewById(R.id.lv_students);
         dbHelper = new SchoolControlDbHelper(this);
         array = new ArrayList<>();
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String id=etId.getText().toString();
+                Cursor cursor;
+                String query="SELECT * FROM "+ SchoolControlContract.Student.TABLE_NAME;
+                if (db!=null){
+                    cursor = db.rawQuery(query,null);
+                    while (cursor.moveToNext()){
+                        if(String.valueOf(cursor.getInt(0)).equals(id)){
+                            Toast.makeText(MainActivity.this, "Usuario encontrado", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
         adapter = new ArrayAdapter<>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,array);
         lvStudents.setAdapter(adapter);
         lvStudents.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -71,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (selected != -1) {
+                    Toast.makeText(MainActivity.this, array.get(selected).toString(), Toast.LENGTH_SHORT).show();
                     array.remove(selected);
                     adapter.notifyDataSetChanged();
                     selected = -1;
@@ -104,12 +122,8 @@ public class MainActivity extends AppCompatActivity {
                             cursor = db.rawQuery(queryNew, new String[]{etId.getText().toString()});
                             while (cursor.moveToNext()){
                                 array.add(
-                                        String.valueOf(cursor.getInt(0))+" NOMBRE: "+
-                                                cursor.getString(1)+" "+
-                                                cursor.getString(2)+
-                                                cursor.getInt(3)+" PROMEDIO:"+
-                                                cursor.getFloat(4)+ "CARRERA: "+
-                                                cursor.getString(5));
+                                        String.valueOf(cursor.getInt(0))
+                                );
                             }
                             adapter.notifyDataSetChanged();
                         }
@@ -124,12 +138,8 @@ public class MainActivity extends AppCompatActivity {
             cursor = db.rawQuery(query,null);
             while (cursor.moveToNext()){
                 array.add(
-                        String.valueOf(cursor.getInt(0))+" NOMBRE: "+
-                        cursor.getString(1)+" "+
-                        cursor.getString(2)+
-                        cursor.getInt(3)+" PROMEDIO:"+
-                        cursor.getFloat(4)+ "CARRERA: "+
-                        cursor.getString(5));
+                        String.valueOf(cursor.getInt(0))
+                );
             }
             adapter.notifyDataSetChanged();
         }
