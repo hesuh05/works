@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">LocalStorage</string>
+    <string name="text_id">Matricula</string>
+    <string name="text_name">Nombre</string>
+    <string name="text_lastname">Apellidos</string>
+    <string name="text_grade">Grado</string>
+    <string name="text_group">Grupo</string>
+    <string name="text_average">Promedio</string>
+    <string name="text_career">Carrera</string>
+    <string name="text_save">Guardar</string>
+    <string name="text_search">Buscar</string>
+    <string name="text_edit">Editar</string>
+    <string name="text_delete">Borrar</string>
+</resources>
