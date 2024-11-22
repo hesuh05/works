@@ -36,10 +36,43 @@ public class MainActivity extends AppCompatActivity {
     private Button btnDelete;
     private ListView lvStudents;
     private ArrayAdapter<String> adapter;
-    private ArrayList<String> array;
+    private ArrayList<String> dataStudents;
     private SQLiteDatabase db;
     private SchoolControlDbHelper dbHelper;
     private int selected;
+    public void getStudents(){
+        dbHelper = new SchoolControlDbHelper(this);
+        db = dbHelper.getReadableDatabase();
+        Cursor cursor= db.query(
+                SchoolControlContract.Student.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                SchoolControlContract.Student.COLUMN_NAME_NAME+", "+SchoolControlContract.Student.COLUMN_NAME_LASTNAME,
+                null
+        );
+        // Crear mi repositorio de datos que seran mostrados en la listView.
+        dataStudents = new ArrayList<>();
+        // Recorrer cursor para llenar mi repositorio
+        while(cursor.moveToNext()==true){
+            dataStudents.add(cursor.getString(0)+"::"+cursor.getString(1)+"::"+cursor.getString(2)+"::"+cursor.getFloat(5));
+        }
+        adapter = new ArrayAdapter<>(this,com.google.android.material.R.layout.support_simple_spinner_dropdown_item,dataStudents);
+        lvStudents.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
+    public void clearFields(){
+        etId.setText("");
+        etName.setText("");
+        etLastname.setText("");
+        etGroup.setText("");
+        etGrade.setText("");
+        etAverage.setText("");
+        etCareer.setText("");
+        etId.requestFocus();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,8 +90,8 @@ public class MainActivity extends AppCompatActivity {
         btnEdit = findViewById(R.id.btn_edit);
         btnDelete = findViewById(R.id.btn_delete);
         lvStudents = findViewById(R.id.lv_students);
+        getStudents();
         dbHelper = new SchoolControlDbHelper(this);
-        array = new ArrayList<>();
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,13 +103,15 @@ public class MainActivity extends AppCompatActivity {
                     while (cursor.moveToNext()){
                         if(String.valueOf(cursor.getInt(0)).equals(id)){
                             Toast.makeText(MainActivity.this, "Usuario encontrado", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(MainActivity.this, "Usuario no encontrado", Toast.LENGTH_SHORT).show();
                         }
                     }
                     adapter.notifyDataSetChanged();
                 }
             }
         });
-        adapter = new ArrayAdapter<>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,array);
+        adapter = new ArrayAdapter<>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,dataStudents);
         lvStudents.setAdapter(adapter);
         lvStudents.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -88,8 +123,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (selected != -1) {
-                    Toast.makeText(MainActivity.this, array.get(selected).toString(), Toast.LENGTH_SHORT).show();
-                    array.remove(selected);
+                    Toast.makeText(MainActivity.this, dataStudents.get(selected).toString(), Toast.LENGTH_SHORT).show();
+                    dataStudents.remove(selected);
                     adapter.notifyDataSetChanged();
                     selected = -1;
                 } else {
@@ -115,33 +150,35 @@ public class MainActivity extends AppCompatActivity {
                     long studentsInserted = db.insert(SchoolControlContract.Student.TABLE_NAME, null, values);
                     if (studentsInserted > 0) {
                         Toast.makeText(MainActivity.this, "Estudiante almacenado con éxito", Toast.LENGTH_SHORT).show();
-                        Cursor cursor;
+                        getStudents();
+                        clearFields();
+                        /*Cursor cursor;
                         db=dbHelper.getWritableDatabase();
                         if (db!=null){
                             String queryNew = "SELECT * FROM "+ SchoolControlContract.Student.TABLE_NAME+" WHERE id = ?";
                             cursor = db.rawQuery(queryNew, new String[]{etId.getText().toString()});
                             while (cursor.moveToNext()){
-                                array.add(
+                                dataStudents.add(
                                         String.valueOf(cursor.getInt(0))
                                 );
                             }
                             adapter.notifyDataSetChanged();
-                        }
+                        }*/
                     }
                 }
             }
         });
-        Cursor cursor;
+        /*Cursor cursor;
         db=dbHelper.getWritableDatabase();
         String query =  "SELECT * FROM "+ SchoolControlContract.Student.TABLE_NAME;
         if (db!=null){
             cursor = db.rawQuery(query,null);
             while (cursor.moveToNext()){
-                array.add(
+                dataStudents.add(
                         String.valueOf(cursor.getInt(0))
                 );
             }
             adapter.notifyDataSetChanged();
-        }
+        }*/
     }
 }

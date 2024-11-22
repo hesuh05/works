@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 
 public class SchoolControlDbHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "schoolcontroldb";
-    public static final int DATABASE_VERSION=1;
+    public static final int DATABASE_VERSION=4;
     public static final String SQL_CREATE_STUDENTS="CREATE TABLE "+
             SchoolControlContract.Student.TABLE_NAME+" ( "+
             SchoolControlContract.Student.COLUMN_NAME_ID+" TEXT PRIMARY KEY,"+

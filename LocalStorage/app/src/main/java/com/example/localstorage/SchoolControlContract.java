@@ -10,7 +10,7 @@ public class SchoolControlContract {
         public static final String COLUMN_NAME_NAME = "name";
         public static final String COLUMN_NAME_LASTNAME = "lastname";
         public static final String COLUMN_NAME_GRADE = "grade";
-        public static final String COLUMN_NAME_GROUP = "groupp";
+        public static final String COLUMN_NAME_GROUP = "group_name";
         public static final String COLUMN_NAME_AVERAGE = "average";
         public static final String COLUMN_NAME_CAREER = "career";
     }
