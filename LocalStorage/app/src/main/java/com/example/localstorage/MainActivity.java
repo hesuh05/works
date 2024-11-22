@@ -40,6 +40,31 @@ public class MainActivity extends AppCompatActivity {
     private SQLiteDatabase db;
     private SchoolControlDbHelper dbHelper;
     private int selected;
+    public void getStudent(String id){
+        db=dbHelper.getReadableDatabase();
+        String selection = SchoolControlContract.Student.COLUMN_NAME_ID + " = ?";
+        String[] selectionArgs={etId.getText().toString()};
+        Cursor cursor =db.query(
+                SchoolControlContract.Student.TABLE_NAME,
+                null,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
+        if (!cursor.moveToNext()){
+            Toast.makeText(this, "No existe el alumno", Toast.LENGTH_SHORT).show();
+            clearFields();
+        } else{
+            etName.setText(cursor.getString(1));
+            etLastname.setText(cursor.getString(2));
+            etGrade.setText(String.valueOf(cursor.getInt(3)));
+            etGroup.setText(cursor.getString(4));
+            etAverage.setText(String.valueOf(cursor.getFloat(5)));
+            etCareer.setText(cursor.getString(6));
+        }
+    }
     public void getStudents(){
         dbHelper = new SchoolControlDbHelper(this);
         db = dbHelper.getReadableDatabase();
@@ -50,8 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 null,
                 null,
                 null,
-                SchoolControlContract.Student.COLUMN_NAME_NAME+", "+SchoolControlContract.Student.COLUMN_NAME_LASTNAME,
-                null
+                SchoolControlContract.Student.COLUMN_NAME_NAME+", "+SchoolControlContract.Student.COLUMN_NAME_LASTNAME
         );
         // Crear mi repositorio de datos que seran mostrados en la listView.
         dataStudents = new ArrayList<>();
@@ -92,10 +116,63 @@ public class MainActivity extends AppCompatActivity {
         lvStudents = findViewById(R.id.lv_students);
         getStudents();
         dbHelper = new SchoolControlDbHelper(this);
+        btnEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (etId.getText().toString().equals("")) {
+                    Toast.makeText(MainActivity.this, "No hay ", Toast.LENGTH_SHORT).show();
+                } else {
+                    db = dbHelper.getWritableDatabase();
+                    ContentValues values = new ContentValues();
+                    values.put(SchoolControlContract.Student.COLUMN_NAME_ID, etId.getText().toString());
+                    values.put(SchoolControlContract.Student.COLUMN_NAME_NAME, etName.getText().toString());
+                    values.put(SchoolControlContract.Student.COLUMN_NAME_LASTNAME, etLastname.getText().toString());
+                    values.put(SchoolControlContract.Student.COLUMN_NAME_GRADE, Integer.parseInt(etGrade.getText().toString()));
+                    values.put(SchoolControlContract.Student.COLUMN_NAME_GROUP, etGroup.getText().toString());
+                    values.put(SchoolControlContract.Student.COLUMN_NAME_AVERAGE, etAverage.getText().toString());
+                    values.put(SchoolControlContract.Student.COLUMN_NAME_CAREER, etCareer.getText().toString());
+                    String selection = SchoolControlContract.Student.COLUMN_NAME_ID+" = ?";
+                    String [] selectionArgs = {etId.getText().toString()};
+                    int updateRows = db.update(
+                            SchoolControlContract.Student.TABLE_NAME,
+                            values,
+                            selection,
+                            selectionArgs
+                    );
+                    if (updateRows>0) {
+                        Toast.makeText(MainActivity.this, "Alumno actualziado", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Alumno no encontrado", Toast.LENGTH_SHORT).show();
+                    }
+                    getStudents();
+                }
+            }
+        });
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db = dbHelper.getWritableDatabase();
+                String selection = SchoolControlContract.Student.COLUMN_NAME_ID+" = ?";
+                String [] selectionArgs = {etId.getText().toString()};
+                int deleteRows = db.delete(SchoolControlContract.Student.TABLE_NAME,selection,selectionArgs);
+                if (deleteRows>0){
+                    Toast.makeText(MainActivity.this, "Estudiante eliminado", Toast.LENGTH_SHORT).show();
+                    clearFields();
+                    getStudents();
+                } else {
+                    Toast.makeText(MainActivity.this, "Estudiante no encontrado", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String id=etId.getText().toString();
+                if (etId.getText().toString().equals("")) {
+                    Toast.makeText(MainActivity.this, "Introduce una matrícula", Toast.LENGTH_SHORT).show();
+                } else {
+                    getStudent(etId.getText().toString());
+                }
+                /*String id=etId.getText().toString();
                 Cursor cursor;
                 String query="SELECT * FROM "+ SchoolControlContract.Student.TABLE_NAME;
                 if (db!=null){
@@ -108,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     adapter.notifyDataSetChanged();
-                }
+                }*/
             }
         });
         adapter = new ArrayAdapter<>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,dataStudents);
@@ -119,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
                 selected=position;
             }
         });
-        btnDelete.setOnClickListener(new View.OnClickListener() {
+        /*btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (selected != -1) {
@@ -131,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "No hay ningun elemento seleccionado", Toast.LENGTH_SHORT).show();
                 }
             }
-        });
+        });*/
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
